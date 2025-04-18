@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chat Widget Embed Demo</title>
+</head>
+<body>
+  <!-- ── Your normal page content goes here ─────────────────── -->
+  <h1>Welcome!</h1>
+  <p>This page demonstrates the floating chat widget.</p>
+
+  <!-- ── Root element for the widget (required) ─────────────── -->
+  <div id="chat-widget-root"></div>
+
+  <!-- ── Loader snippet that pulls the bundle from Netlify ───── -->
+  <script>
+    (function () {
+      const s = document.createElement('script');
+      s.src   = 'https://stunning-pudding-9ba665.netlify.app/chat-widget.js';  /* <-- change if you use a different URL */
+      s.defer = true;          /* load after parsing HTML */
+      document.head.appendChild(s);
+    })();
+  </script>
+</body>
+</html>
