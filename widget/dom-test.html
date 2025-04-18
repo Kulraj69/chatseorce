@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Widget DOM Test</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    pre { background: #f0f0f0; padding: 10px; }
+    .found { color: green; }
+    .not-found { color: red; }
+  </style>
+</head>
+<body>
+  <h1>Widget DOM Element Test</h1>
+  
+  <!-- Test buttons -->
+  <button id="check-dom">Check DOM Elements</button>
+  <div id="results"></div>
+  
+  <!-- Include the widget -->
+  <script src="./dist/chat-widget.js" defer></script>
+  
+  <!-- Test script -->
+  <script>
+    // Wait for DOM to fully load
+    window.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('check-dom').addEventListener('click', () => {
+        const results = document.getElementById('results');
+        results.innerHTML = '';
+        
+        // Elements to check
+        const elements = [
+          '.cw-container',
+          '.cw-bubble',
+          '.cw-window',
+          '.cw-message-list'
+        ];
+        
+        // Check each element
+        elements.forEach(selector => {
+          const el = document.querySelector(selector);
+          const div = document.createElement('div');
+          
+          if (el) {
+            div.className = 'found';
+            div.textContent = `✅ ${selector} - FOUND`;
+            
+            // Show computed styles for the bubble
+            if (selector === '.cw-bubble') {
+              const styles = window.getComputedStyle(el);
+              const styleInfo = document.createElement('pre');
+              styleInfo.textContent = `
+Position: ${styles.position}
+Display: ${styles.display}
+Z-index: ${styles.zIndex}
+Visibility: ${styles.visibility}
+Opacity: ${styles.opacity}
+Top: ${styles.top}
+Left: ${styles.left}
+Bottom: ${styles.bottom}
+Right: ${styles.right}
+Background: ${styles.backgroundColor}
+Width: ${styles.width}
+Height: ${styles.height}
+`;
+              div.appendChild(styleInfo);
+            }
+          } else {
+            div.className = 'not-found';
+            div.textContent = `❌ ${selector} - NOT FOUND`;
+          }
+          
+          results.appendChild(div);
+        });
+      });
+    });
+  </script>
+</body>
+</html> 

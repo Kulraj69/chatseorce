@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>API Connection Test</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      max-width: 800px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+    #console {
+      background-color: #f0f0f0;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      margin-top: 20px;
+      min-height: 100px;
+      max-height: 400px;
+      overflow-y: auto;
+      font-family: monospace;
+    }
+    .error { color: red; }
+    .success { color: green; }
+    .info { color: blue; }
+    button {
+      padding: 8px 16px;
+      margin-right: 10px;
+      margin-bottom: 10px;
+      cursor: pointer;
+    }
+    input {
+      padding: 8px;
+      width: 300px;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>API Connection Test</h1>
+  
+  <p>This page will help diagnose issues with the backend API connection.</p>
+  
+  <div>
+    <input type="text" id="api-url" value="http://127.0.0.1:8000" placeholder="API URL">
+    <button id="test-connection">Test API Connection</button>
+  </div>
+  
+  <div>
+    <input type="text" id="question" value="What is RAG?" placeholder="Enter a question">
+    <button id="send-query">Send Query</button>
+  </div>
+  
+  <div id="console"></div>
+  
+  <script>
+    // Setup console
+    const debugConsole = document.getElementById('console');
+    function log(message, type = 'info') {
+      const div = document.createElement('div');
+      div.className = type;
+      const timestamp = new Date().toLocaleTimeString();
+      div.textContent = `[${timestamp}] ${message}`;
+      debugConsole.appendChild(div);
+      debugConsole.scrollTop = debugConsole.scrollHeight;
+    }
+
+    // Test basic API connection
+    document.getElementById('test-connection').addEventListener('click', async function() {
+      const apiUrl = document.getElementById('api-url').value.trim();
+      if (!apiUrl) {
+        log('Please enter an API URL', 'error');
+        return;
+      }
+      
+      log(`Testing connection to ${apiUrl}...`);
+      
+      try {
+        // First try a simple OPTIONS request to check CORS
+        const optionsResponse = await fetch(apiUrl, { 
+          method: 'OPTIONS',
+          headers: {
+            'Access-Control-Request-Method': 'POST',
+            'Access-Control-Request-Headers': 'Content-Type',
+            'Origin': window.location.origin
+          }
+        });
+        
+        log(`OPTIONS status: ${optionsResponse.status} ${optionsResponse.statusText}`, 
+          optionsResponse.ok ? 'success' : 'error');
+        
+        // Check CORS headers
+        const corsHeaders = {
+          'Access-Control-Allow-Origin': optionsResponse.headers.get('Access-Control-Allow-Origin'),
+          'Access-Control-Allow-Methods': optionsResponse.headers.get('Access-Control-Allow-Methods'),
+          'Access-Control-Allow-Headers': optionsResponse.headers.get('Access-Control-Allow-Headers')
+        };
+        
+        log('CORS Headers:', corsHeaders.some(h => h === null) ? 'error' : 'info');
+        Object.entries(corsHeaders).forEach(([key, value]) => {
+          log(`  ${key}: ${value || 'not present'}`, value ? 'success' : 'error');
+        });
+        
+        // Now try a GET request to /docs (assuming FastAPI)
+        const docsResponse = await fetch(`${apiUrl}/docs`);
+        log(`GET /docs status: ${docsResponse.status} ${docsResponse.statusText}`, 
+          docsResponse.ok ? 'success' : 'error');
+          
+        if (docsResponse.ok) {
+          log('FastAPI is running and accessible!', 'success');
+        }
+      } catch (error) {
+        log(`Connection error: ${error.message}`, 'error');
+        log('This may indicate a CORS issue or that the API server is not running.', 'error');
+      }
+    });
+    
+    // Test sending a query
+    document.getElementById('send-query').addEventListener('click', async function() {
+      const apiUrl = document.getElementById('api-url').value.trim();
+      const question = document.getElementById('question').value.trim();
+      
+      if (!apiUrl) {
+        log('Please enter an API URL', 'error');
+        return;
+      }
+      
+      if (!question) {
+        log('Please enter a question', 'error');
+        return;
+      }
+      
+      log(`Sending query to ${apiUrl}/query...`);
+      
+      try {
+        const response = await fetch(`${apiUrl}/query`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ question })
+        });
+        
+        log(`POST status: ${response.status} ${response.statusText}`, 
+          response.ok ? 'success' : 'error');
+        
+        if (response.ok) {
+          const data = await response.json();
+          log('Response received:', 'success');
+          log(JSON.stringify(data, null, 2));
+        } else {
+          const text = await response.text();
+          log(`Error response: ${text}`, 'error');
+        }
+      } catch (error) {
+        log(`Query error: ${error.message}`, 'error');
+      }
+    });
+    
+    // Log some basic info on load
+    log(`Page loaded at: ${window.location.href}`);
+    log(`Origin: ${window.location.origin}`);
+  </script>
+</body>
+</html>

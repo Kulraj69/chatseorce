@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Explicit Init Test</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    button { padding: 10px; background: #4a6cf7; color: white; border: none; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <h1>Explicit Widget Initialization</h1>
+  <p>This page will attempt to manually initialize the widget.</p>
+  
+  <button id="init-widget">Initialize Widget</button>
+  
+  <!-- Create a fixed element as reference -->
+  <div style="position: fixed; bottom: 100px; right: 100px; width: 40px; height: 40px; background: red; border-radius: 50%; z-index: 9999;"></div>
+  
+  <!-- Root element -->
+  <div id="chat-widget-root"></div>
+  
+  <!-- Include widget script -->
+  <script src="./dist/chat-widget.js"></script>
+  
+  <script>
+    document.getElementById('init-widget').addEventListener('click', function() {
+      if (window.initChatWidget) {
+        window.initChatWidget();
+        alert('Widget initialization called!');
+      } else {
+        alert('Widget initialization function not found!');
+      }
+    });
+  </script>
+</body>
+</html> 

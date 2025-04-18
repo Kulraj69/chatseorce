@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Debug Chat Widget</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      max-width: 800px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+    #debug-console {
+      background-color: #f0f0f0;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      margin-top: 20px;
+      min-height: 100px;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+    .error { color: red; }
+    .success { color: green; }
+    .info { color: blue; }
+  </style>
+</head>
+<body>
+  <h1>Debug Chat Widget</h1>
+  <p>Open your browser console (F12) to see any errors</p>
+  
+  <div id="chat-widget-root"></div>
+  <script>
+    console.log("Debug script loaded");
+    window.addEventListener('error', function(event) {
+      console.error('Global error:', event.message);
+    });
+  </script>
+  <script src="./dist/chat-widget.js" defer></script>
+</body>
+</html> 
